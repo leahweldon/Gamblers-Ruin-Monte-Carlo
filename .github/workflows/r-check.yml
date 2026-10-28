@@ -47,14 +47,6 @@ jobs:
         run: Rscript scripts/publication_figures.R
       - name: Verify publication artifact structure
         run: Rscript tests/release_gate.R
-      - name: Assemble clean public source archive
-        run: python3 scripts/build_public_release.py
-      - name: Upload clean public source archive
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: public-source-release
-          path: release-dist/gamblers-ruin-public-source.zip
-          if-no-files-found: error
       - name: Retain generated results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
