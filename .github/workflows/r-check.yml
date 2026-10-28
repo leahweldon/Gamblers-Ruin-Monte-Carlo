@@ -1,0 +1,64 @@
+name: R validation
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  tests-and-experiments:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+      - name: Run deterministic tests
+        run: Rscript tests/test_all.R
+      - name: Run independent theoretical cross-checks
+        run: Rscript tests/test_independent_theory.R
+      - name: Validate trajectory contracts and RNG isolation
+        run: Rscript tests/test_trajectory_contracts.R
+      - name: Verify first-passage boundary cases
+        run: Rscript tests/test_first_passage_boundaries.R
+      - name: Reproduce experiment outputs
+        run: Rscript scripts/run_experiments.R
+      - name: Validate generated research results
+        run: Rscript tests/validate_results.R
+      - name: Run replicated research experiments
+        run: Rscript scripts/research_experiments.R
+      - name: Validate extended experiments
+        run: Rscript tests/validate_research.R
+      - name: Measure simulation performance
+        run: Rscript scripts/benchmark.R
+      - name: Validate benchmark outputs
+        run: Rscript tests/validate_benchmark.R
+      - name: Check numerical stability
+        run: Rscript tests/test_numerical_stability.R
+      - name: Study confidence interval coverage
+        run: Rscript scripts/coverage_study.R
+      - name: Validate coverage study
+        run: Rscript tests/validate_coverage.R
+      - name: Generate publication figures
+        run: Rscript scripts/publication_figures.R
+      - name: Verify publication artifact structure
+        run: Rscript tests/release_gate.R
+      - name: Assemble clean public source archive
+        run: python3 scripts/build_public_release.py
+      - name: Upload clean public source archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-source-release
+          path: release-dist/gamblers-ruin-public-source.zip
+          if-no-files-found: error
+      - name: Retain generated results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: experiment-results
+          path: results/
+          if-no-files-found: warn
