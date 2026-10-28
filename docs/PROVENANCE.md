@@ -1,0 +1,1 @@
+The motivating problem was investigated in a 2022 Applied Probability I group assignment. This is a separate modern research extension. No historical university submission is included. The gambler's ruin mathematical model is classical.
