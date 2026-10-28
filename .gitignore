@@ -1,0 +1,6 @@
+/.Rhistory
+/.RData
+/.Rproj.user/
+/results/*.csv
+/results/*.pdf
+.DS_Store
